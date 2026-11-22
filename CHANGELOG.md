@@ -1,3 +1,7 @@
+## 0.1.1
+
+- Smaller README demo GIF for pub.dev image proxy; package `screenshots` entry.
+
 ## 0.1.0
 
 - Initial pub.dev package: `BracketStage`, layout engine, connector painter, and data models.
