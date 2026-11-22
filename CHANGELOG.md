@@ -1,3 +1,7 @@
+## 0.1.2
+
+- Fix pub.dev README images: real `repository` URL and `example/demo_gifs/` paths (same pattern as `animations`).
+
 ## 0.1.1
 
 - Smaller README demo GIF for pub.dev image proxy; package `screenshots` entry.

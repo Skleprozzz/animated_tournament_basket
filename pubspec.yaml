@@ -2,9 +2,10 @@ name: animated_tournament_basket
 description: >-
   Animated single-elimination tournament bracket with connector paths,
   round transitions, and customizable match slot widgets.
-version: 0.1.1
-homepage: https://github.com/example/animated_tournament_basket
-repository: https://github.com/example/animated_tournament_basket
+version: 0.1.2
+homepage: https://github.com/Skleprozzz/animated_tournament_basket
+repository: https://github.com/Skleprozzz/animated_tournament_basket
+issue_tracker: https://github.com/Skleprozzz/animated_tournament_basket/issues
 
 environment:
   sdk: ^3.14.0
@@ -21,4 +22,4 @@ flutter:
 
 screenshots:
   - description: Playoff bracket with round tabs and slide animation.
-    path: doc/bracket_demo.gif
+    path: example/demo_gifs/bracket_demo.gif

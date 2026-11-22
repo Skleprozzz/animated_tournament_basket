@@ -4,17 +4,16 @@ Animated single-elimination tournament bracket for Flutter: horizontal round car
 
 ## Demo
 
-![Bracket tabs and round animation](doc/bracket_demo.gif)
+![Bracket tabs and round animation](example/demo_gifs/bracket_demo.gif)
 
-> **pub.dev** renders **images only** in the README (this GIF). It does not embed `.mp4` — the link below is for download / GitHub. After changing demo assets, publish a **new version** so the README image URL updates.
-
-[Download demo video (MP4)](doc/bracket_demo.mp4)
+Run the example for the full recording: `cd example && flutter run`.  
+[Demo video (MP4)](example/demo_gifs/bracket_demo.mp4)
 
 ## Install
 
 ```yaml
 dependencies:
-  animated_tournament_basket: ^0.1.0
+  animated_tournament_basket: ^0.1.2
 ```
 
 ## Minimal usage
@@ -48,6 +47,14 @@ The example includes round tabs, theme toggle, demo match cards, and mock US/EU 
 ## Layout and animation
 
 See [doc/BRACKET_LAYOUT_AND_ANIMATION.md](doc/BRACKET_LAYOUT_AND_ANIMATION.md).
+
+## Publishing (maintainers)
+
+```bash
+dart pub publish
+```
+
+Dry run: `dart pub publish --dry-run`.
 
 ## License
 
