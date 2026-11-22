@@ -108,7 +108,7 @@ class BracketConnectorPainter extends CustomPainter {
               ? (1.0 - motionT).clamp(0.0, 1.0)
               : 1.0;
           final stroke = Paint()
-            ..color = baseColor.withValues(alpha: lineFade)
+            ..color = baseColor.withOpacity(lineFade)
             ..strokeWidth = isWinnerPath ? 2 : 1.5
             ..style = PaintingStyle.stroke
             ..strokeCap = StrokeCap.round

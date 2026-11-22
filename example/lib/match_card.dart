@@ -39,7 +39,7 @@ class MatchCard extends StatelessWidget {
                     ? null
                     : [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.06),
+                          color: Colors.black.withOpacity(0.06),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -185,7 +185,7 @@ class _TeamBadge extends StatelessWidget {
       height: 22,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: team!.color.withValues(alpha: 0.85),
+        color: team!.color.withOpacity(0.85),
         shape: BoxShape.circle,
       ),
       child: Text(

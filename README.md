@@ -13,7 +13,7 @@ Run the example for the full recording: `cd example && flutter run`.
 
 ```yaml
 dependencies:
-  animated_tournament_basket: ^0.1.3
+  animated_tournament_basket: ^0.1.4
 ```
 
 ## Minimal usage

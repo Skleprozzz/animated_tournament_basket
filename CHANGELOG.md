@@ -1,3 +1,7 @@
+## 0.1.4
+
+- Lower SDK constraint to `^3.6.0`; `Color.withOpacity` for broader Flutter compatibility.
+
 ## 0.1.3
 
 - Dartdoc on public API (pub.dev documentation score).
