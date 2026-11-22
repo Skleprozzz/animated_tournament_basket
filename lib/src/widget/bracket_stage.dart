@@ -10,12 +10,14 @@ import '../paint/bracket_connector_painter.dart';
 import '../theme/bracket_colors.dart';
 
 /// Builds the widget for one match slot at layout [width].
-typedef BracketMatchBuilder =
-    Widget Function(BuildContext context, MatchNode match, double width);
+typedef BracketMatchBuilder = Widget Function(
+    BuildContext context, MatchNode match, double width);
 
 /// Interactive bracket viewport: round slide, slot layout, connectors, swipe.
 ///
 /// The host owns round index state, `animFrom` / `animTo`, and [roundAnimation].
+/// Call [setState] after mutating [MatchNode] fields in place so connectors refresh.
+/// Requires a power-of-two single-elimination tree (see [BracketData.roundCountForTeams]).
 class BracketStage extends StatefulWidget {
   /// Creates a bracket stage.
   const BracketStage({
@@ -65,6 +67,25 @@ class BracketStage extends StatefulWidget {
 class _BracketStageState extends State<BracketStage> {
   double _dragAccum = 0;
 
+  int get _lastRoundIndex =>
+      widget.data.roundCount > 0 ? widget.data.roundCount - 1 : -1;
+
+  bool get _hasRounds => widget.data.roundCount > 0;
+
+  @override
+  void didUpdateWidget(covariant BracketStage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final max = _lastRoundIndex;
+    if (max < 0) return;
+    if (widget.focusedRound > max ||
+        widget.animFrom > max ||
+        widget.animTo > max) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) widget.onFocusChanged(max);
+      });
+    }
+  }
+
   BracketLayoutEngine _layoutFor(double cardWidth, double columnPitch) =>
       BracketLayoutEngine(
         roundCount: widget.data.roundCount,
@@ -75,10 +96,9 @@ class _BracketStageState extends State<BracketStage> {
       );
 
   void _goDelta(int delta) {
-    final next = (widget.focusedRound + delta).clamp(
-      0,
-      widget.data.roundCount - 1,
-    );
+    final max = _lastRoundIndex;
+    if (max < 0) return;
+    final next = (widget.focusedRound + delta).clamp(0, max);
     if (next != widget.focusedRound) {
       widget.onFocusChanged(next);
     }
@@ -103,7 +123,8 @@ class _BracketStageState extends State<BracketStage> {
   }
 
   Set<int> _visibleCardRounds(int focus) {
-    final last = widget.data.roundCount - 1;
+    if (!_hasRounds) return const {};
+    final last = _lastRoundIndex;
     if (_phaseActive) {
       final rounds = {widget.animFrom, widget.animTo};
       final goingDeeper = widget.animTo > widget.animFrom;
@@ -170,20 +191,23 @@ class _BracketStageState extends State<BracketStage> {
 
   @override
   Widget build(BuildContext context) {
+    if (!_hasRounds) {
+      return const SizedBox.shrink();
+    }
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final viewport =
             constraints.hasBoundedWidth && constraints.hasBoundedHeight
-            ? constraints
-            : BoxConstraints(
-                maxWidth: MediaQuery.sizeOf(context).width,
-                maxHeight: MediaQuery.sizeOf(context).height,
-              );
+                ? constraints
+                : BoxConstraints(
+                    maxWidth: MediaQuery.sizeOf(context).width,
+                    maxHeight: MediaQuery.sizeOf(context).height,
+                  );
 
         return AnimatedBuilder(
           animation: widget.roundAnimation,
           builder: (context, _) {
-            final round0Count = widget.data.rounds.first.length;
             final layoutFocus = _layoutFocus;
             final cardRounds = _visibleCardRounds(layoutFocus);
 
@@ -226,11 +250,9 @@ class _BracketStageState extends State<BracketStage> {
                         toFocus: widget.animTo,
                         t: _t,
                         colors: widget.colors,
-                        round0MatchCount: round0Count,
                         visibleRounds: connectorRounds,
                         transitioning: _phaseActive,
                         focusColumn: layoutFocus,
-                        motionT: _t,
                       ),
                     ),
                     for (var r = 0; r < widget.data.roundCount; r++)
@@ -243,6 +265,8 @@ class _BracketStageState extends State<BracketStage> {
             );
 
             return GestureDetector(
+              onHorizontalDragStart: (_) => _dragAccum = 0,
+              onHorizontalDragCancel: () => _dragAccum = 0,
               onHorizontalDragUpdate: (d) => _dragAccum += d.delta.dx,
               onHorizontalDragEnd: (d) {
                 const threshold = 48.0;

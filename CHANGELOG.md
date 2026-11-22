@@ -1,3 +1,10 @@
+## 0.1.5
+
+- Hardening: empty [BracketData], repaint on data/layout changes, winner paths by `Team.id`.
+- [BracketColors] equality; `didUpdateWidget` clamps round index when tree shrinks.
+- Stop exporting layout engine and connector painter; `.pubignore` duplicate demo media in `doc/`.
+- Basic tests; document power-of-two-only trees.
+
 ## 0.1.4
 
 - Lower SDK constraint to `^3.6.0`; `Color.withOpacity` for broader Flutter compatibility.

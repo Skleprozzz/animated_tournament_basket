@@ -73,4 +73,33 @@ class BracketColors {
     tabBar: Color(0xFFFFFFFF),
     isDark: false,
   );
+
+  @override
+  bool operator ==(Object other) {
+    return other is BracketColors &&
+        background == other.background &&
+        surface == other.surface &&
+        card == other.card &&
+        border == other.border &&
+        textPrimary == other.textPrimary &&
+        textSecondary == other.textSecondary &&
+        lineMuted == other.lineMuted &&
+        connectorWinner == other.connectorWinner &&
+        tabBar == other.tabBar &&
+        isDark == other.isDark;
+  }
+
+  @override
+  int get hashCode => Object.hash(
+        background,
+        surface,
+        card,
+        border,
+        textPrimary,
+        textSecondary,
+        lineMuted,
+        connectorWinner,
+        tabBar,
+        isDark,
+      );
 }

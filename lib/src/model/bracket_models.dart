@@ -47,6 +47,7 @@ class Team {
 
   /// Up to two characters derived from [shortName].
   String get initials {
+    if (shortName.isEmpty) return '';
     final parts = shortName.split(' ');
     if (parts.length >= 2) {
       return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
@@ -145,7 +146,14 @@ class BracketData {
   }
 
   /// Round count for a power-of-two [teamCount] (e.g. `32` → `5`).
+  ///
+  /// Layout assumes a full binary tree; non-power-of-two counts are not
+  /// supported by [BracketLayoutEngine] (no byes).
   static int roundCountForTeams(int teamCount) {
+    assert(
+      teamCount > 0 && (teamCount & (teamCount - 1)) == 0,
+      'teamCount must be a power of 2',
+    );
     return (math.log(teamCount) / math.ln2).round();
   }
 }

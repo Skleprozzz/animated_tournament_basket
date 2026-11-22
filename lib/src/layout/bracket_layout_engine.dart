@@ -200,8 +200,7 @@ class BracketLayoutEngine {
     final matches = matchCountInRound(columnRound);
     var maxBottom = kStageTopPad;
     for (var s = 0; s < matches; s++) {
-      final bottom =
-          matchTopY(
+      final bottom = matchTopY(
             animFrom,
             animTo,
             focusColumn,

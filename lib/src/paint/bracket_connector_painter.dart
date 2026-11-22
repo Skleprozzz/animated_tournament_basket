@@ -16,11 +16,9 @@ class BracketConnectorPainter extends CustomPainter {
     required this.toFocus,
     required this.t,
     required this.colors,
-    required this.round0MatchCount,
     required this.visibleRounds,
     required this.transitioning,
     required this.focusColumn,
-    required this.motionT,
   });
 
   /// Bracket tree.
@@ -41,9 +39,6 @@ class BracketConnectorPainter extends CustomPainter {
   /// Connector and winner-path colors.
   final BracketColors colors;
 
-  /// Match count in round `0`.
-  final int round0MatchCount;
-
   /// Round indices currently drawn.
   final Set<int> visibleRounds;
 
@@ -52,9 +47,6 @@ class BracketConnectorPainter extends CustomPainter {
 
   /// Layout focus column for peek alignment.
   final int focusColumn;
-
-  /// Same as transition `t` for line fade when advancing rounds.
-  final double motionT;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -98,15 +90,13 @@ class BracketConnectorPainter extends CustomPainter {
           final feederRight = layout.cardAnchorRight(r, slot, feederTop);
 
           final isWinnerPath = _feedsWinner(feeder, child);
-          final baseColor = isWinnerPath
-              ? colors.connectorWinner
-              : colors.lineMuted;
+          final baseColor =
+              isWinnerPath ? colors.connectorWinner : colors.lineMuted;
           final goingDeeper = toFocus > fromFocus;
           final fadingOutgoingColumn =
               transitioning && goingDeeper && r == fromFocus;
-          final lineFade = fadingOutgoingColumn
-              ? (1.0 - motionT).clamp(0.0, 1.0)
-              : 1.0;
+          final lineFade =
+              fadingOutgoingColumn ? (1.0 - t).clamp(0.0, 1.0) : 1.0;
           final stroke = Paint()
             ..color = baseColor.withOpacity(lineFade)
             ..strokeWidth = isWinnerPath ? 2 : 1.5
@@ -123,11 +113,16 @@ class BracketConnectorPainter extends CustomPainter {
   bool _feedsWinner(MatchNode feeder, MatchNode child) {
     if (feeder.winner == null) return false;
     if (child.home == null && child.away == null) return false;
-    final winnerTeam = feeder.winner == MatchSide.home
-        ? feeder.home
-        : feeder.away;
+    final winnerTeam =
+        feeder.winner == MatchSide.home ? feeder.home : feeder.away;
     if (winnerTeam == null) return false;
-    return winnerTeam == child.home || winnerTeam == child.away;
+    return _teamAdvances(winnerTeam, child.home) ||
+        _teamAdvances(winnerTeam, child.away);
+  }
+
+  bool _teamAdvances(Team winner, Team? slotTeam) {
+    if (slotTeam == null) return false;
+    return winner.id == slotTeam.id;
   }
 
   void _drawElbow(
@@ -186,12 +181,32 @@ class BracketConnectorPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant BracketConnectorPainter old) {
-    return old.fromFocus != fromFocus ||
+    return old.data != data ||
+        _matchGraphEpoch(old.data) != _matchGraphEpoch(data) ||
+        old.layout != layout ||
+        old.transitioning != transitioning ||
+        old.fromFocus != fromFocus ||
         old.toFocus != toFocus ||
         old.t != t ||
         old.colors != colors ||
         old.visibleRounds != visibleRounds ||
-        old.focusColumn != focusColumn ||
-        old.motionT != motionT;
+        old.focusColumn != focusColumn;
   }
+}
+
+int _matchGraphEpoch(BracketData data) {
+  var epoch = 0;
+  for (final round in data.rounds) {
+    for (final m in round) {
+      epoch = Object.hash(
+        epoch,
+        m.winner,
+        m.home?.id,
+        m.away?.id,
+        m.homeScore,
+        m.awayScore,
+      );
+    }
+  }
+  return epoch;
 }
