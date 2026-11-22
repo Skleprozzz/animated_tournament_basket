@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 
 import 'match_card.dart';
 import 'mock_bracket.dart';
+import 'round_focus_steps.dart';
 import 'round_tab_bar.dart';
 
 void main() {
@@ -57,16 +58,20 @@ class _TournamentHomeState extends State<TournamentHome>
     teamCount: kExampleBracketTeamCount,
   );
   late int _focusedRound = 0;
+  int _targetRound = 0;
   late int _animFrom;
   late int _animTo;
   late final AnimationController _roundController;
   late final CurvedAnimation _roundCurve;
+  bool _roundStepInFlight = false;
+  int? _chainHopCount;
 
   @override
   void initState() {
     super.initState();
     _animFrom = _focusedRound;
     _animTo = _focusedRound;
+    _targetRound = _focusedRound;
     _roundController = AnimationController(
       vsync: this,
       duration: kRoundAnimDuration,
@@ -80,20 +85,67 @@ class _TournamentHomeState extends State<TournamentHome>
 
   @override
   void dispose() {
+    _roundCurve.dispose();
     _roundController.dispose();
     super.dispose();
   }
 
+  void _syncChainHopCount() {
+    final hops = (_targetRound - _focusedRound).abs();
+    if (hops <= 1) {
+      _chainHopCount = null;
+    } else if (!_roundStepInFlight) {
+      _chainHopCount = hops;
+    }
+  }
+
+  void _setStepDuration() {
+    final hops = _chainHopCount;
+    if (hops == null || hops <= 1) {
+      _roundController.duration = kRoundAnimDuration;
+      return;
+    }
+    final ms = (kRoundAnimDuration.inMilliseconds / hops).round().clamp(
+      80,
+      4000,
+    );
+    _roundController.duration = Duration(milliseconds: ms);
+  }
+
   void _setFocusedRound(int next) {
-    final clamped = next.clamp(0, _data.roundCount - 1);
-    if (clamped == _focusedRound) return;
+    final last = _data.roundCount - 1;
+    final clamped = next.clamp(0, last);
+    if (clamped == _focusedRound && !_roundStepInFlight) {
+      return;
+    }
+    _targetRound = clamped;
+    if (_roundStepInFlight) {
+      final hops = (clamped - _focusedRound).abs();
+      _chainHopCount = hops > 1 ? hops : null;
+    }
+    _syncChainHopCount();
+    _runNextRoundStepIfNeeded();
+  }
+
+  void _runNextRoundStepIfNeeded() {
+    if (_roundStepInFlight) {
+      return;
+    }
+    if (_focusedRound == _targetRound) {
+      return;
+    }
+
     final from = _focusedRound;
+    final stepTarget = roundFocusSteps(from: from, to: _targetRound).first;
+
+    _roundStepInFlight = true;
     _roundController.stop();
+    _setStepDuration();
     _roundController.value = 0;
     setState(() {
       _animFrom = from;
-      _animTo = clamped;
-      _focusedRound = clamped;
+      _animTo = stepTarget;
+      _focusedRound = stepTarget;
     });
     _roundController.forward().whenComplete(() {
       if (!mounted) return;
@@ -101,6 +153,13 @@ class _TournamentHomeState extends State<TournamentHome>
         _animFrom = _focusedRound;
         _animTo = _focusedRound;
       });
+      _roundStepInFlight = false;
+      if (_focusedRound == _targetRound) {
+        _chainHopCount = null;
+        _roundController.duration = kRoundAnimDuration;
+      } else {
+        _runNextRoundStepIfNeeded();
+      }
     });
   }
 

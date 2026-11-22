@@ -65,10 +65,9 @@ Match slots are built with `BracketStage.matchBuilder`; connector anchors use `s
 
 Implemented in **`example/lib/main.dart`** (`_setFocusedRound`), not in the package.
 
-1. `from = focusedRound`; stop controller; `value = 0`.
-2. `setState`: `animFrom = from`, `animTo = next`, `focusedRound = next`.
-3. `_roundController.forward()`.
-4. `whenComplete`: `animFrom = animTo = focusedRound`.
+1. Tab/skip targets update `_targetRound`; each hop advances one index (`round_focus_steps.dart`).
+2. Multi-hop chains split `kRoundAnimDuration` evenly across the hop count (fixed when the chain starts).
+3. Single ±1 moves (swipe or adjacent tab) use the full `kRoundAnimDuration`.
 
 **`_phaseActive`** = `animFrom != animTo`.
 

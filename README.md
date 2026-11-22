@@ -2,6 +2,12 @@
 
 Animated single-elimination tournament bracket for Flutter: horizontal round carousel, vertical stack animation, and `CustomPainter` connector paths. Match cells are **your widgets** via `BracketStage.matchBuilder`.
 
+## Demo
+
+![Bracket tabs and round animation](doc/bracket_demo.gif)
+
+Smaller file: [doc/bracket_demo.mp4](doc/bracket_demo.mp4) (loops in the example app).
+
 ## Install
 
 ```yaml
