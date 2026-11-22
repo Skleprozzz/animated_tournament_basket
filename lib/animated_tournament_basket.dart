@@ -1,3 +1,8 @@
+/// Animated single-elimination tournament bracket for Flutter.
+///
+/// Use [BracketStage] with your own [BracketMatchBuilder] for match cells.
+/// Supply [BracketData] and drive [focusedRound] with an [AnimationController]
+/// (see the example app for tab UI).
 library;
 
 export 'src/config.dart';

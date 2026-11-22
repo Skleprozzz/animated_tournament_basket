@@ -1,3 +1,7 @@
+## 0.1.3
+
+- Dartdoc on public API (pub.dev documentation score).
+
 ## 0.1.2
 
 - Fix pub.dev README images: real `repository` URL and `example/demo_gifs/` paths (same pattern as `animations`).

@@ -6,7 +6,9 @@ import '../model/bracket_models.dart';
 import '../layout/bracket_layout_engine.dart';
 import '../theme/bracket_colors.dart';
 
+/// Draws bracket elbows between feeder matches and child slots.
 class BracketConnectorPainter extends CustomPainter {
+  /// Creates a painter synced with the current layout and transition.
   BracketConnectorPainter({
     required this.data,
     required this.layout,
@@ -21,16 +23,37 @@ class BracketConnectorPainter extends CustomPainter {
     required this.motionT,
   });
 
+  /// Bracket tree.
   final BracketData data;
+
+  /// Layout used for anchors.
   final BracketLayoutEngine layout;
+
+  /// Transition start round index.
   final int fromFocus;
+
+  /// Transition end round index.
   final int toFocus;
+
+  /// Transition progress in `[0, 1]`.
   final double t;
+
+  /// Connector and winner-path colors.
   final BracketColors colors;
+
+  /// Match count in round `0`.
   final int round0MatchCount;
+
+  /// Round indices currently drawn.
   final Set<int> visibleRounds;
+
+  /// Whether [fromFocus] != [toFocus].
   final bool transitioning;
+
+  /// Layout focus column for peek alignment.
   final int focusColumn;
+
+  /// Same as transition `t` for line fade when advancing rounds.
   final double motionT;
 
   @override

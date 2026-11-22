@@ -9,10 +9,15 @@ import '../model/bracket_models.dart';
 import '../paint/bracket_connector_painter.dart';
 import '../theme/bracket_colors.dart';
 
+/// Builds the widget for one match slot at layout [width].
 typedef BracketMatchBuilder =
     Widget Function(BuildContext context, MatchNode match, double width);
 
+/// Interactive bracket viewport: round slide, slot layout, connectors, swipe.
+///
+/// The host owns round index state, `animFrom` / `animTo`, and [roundAnimation].
 class BracketStage extends StatefulWidget {
+  /// Creates a bracket stage.
   const BracketStage({
     super.key,
     required this.data,
@@ -26,14 +31,31 @@ class BracketStage extends StatefulWidget {
     this.slotHeight = kCardHeight,
   });
 
+  /// Tree to render.
   final BracketData data;
+
+  /// Colors for connectors (slot chrome is up to [matchBuilder]).
   final BracketColors colors;
+
+  /// Active round tab index, `0` .. `data.roundCount - 1`.
   final int focusedRound;
+
+  /// Round index at the start of the current transition.
   final int animFrom;
+
+  /// Round index at the end of the current transition.
   final int animTo;
+
+  /// Scalar `t` in `[0, 1]` for the transition between [animFrom] and [animTo].
   final Animation<double> roundAnimation;
+
+  /// Called when the user swipes or host UI changes the focused round.
   final ValueChanged<int> onFocusChanged;
+
+  /// Builds each visible match slot.
   final BracketMatchBuilder matchBuilder;
+
+  /// Height passed to the layout engine for connector anchors.
   final double slotHeight;
 
   @override

@@ -1,10 +1,10 @@
-import 'dart:ui' show lerpDouble;
-
-import 'dart:ui' show Offset;
+import 'dart:ui' show Offset, lerpDouble;
 
 import '../config.dart';
 
+/// Computes match slot positions and connector anchor points for [BracketStage].
 class BracketLayoutEngine {
+  /// Creates a layout for the given viewport geometry.
   BracketLayoutEngine({
     required this.roundCount,
     required this.firstRoundMatchCount,
@@ -13,23 +13,36 @@ class BracketLayoutEngine {
     this.slotHeight = kCardHeight,
   });
 
+  /// Total round columns in the tree.
   final int roundCount;
+
+  /// Matches in round `0`.
   final int firstRoundMatchCount;
+
+  /// Width of each match slot.
   final double cardWidth;
+
+  /// Horizontal distance between round column origins.
   final double columnPitch;
+
+  /// Vertical size of each slot used for stacking and connectors.
   final double slotHeight;
 
+  /// Matches in [roundIndex] (`firstRoundMatchCount >> roundIndex`).
   int matchCountInRound(int roundIndex) => firstRoundMatchCount >> roundIndex;
 
   double _stackTopY(int stageRound, int slotIndex, double gap) =>
       kStageTopPad + slotIndex * (slotHeight + gap);
 
+  /// Top Y for round `0` slots using [kLooseCardGap].
   double looseTopY(int stageRound, int slotIndex) =>
       _stackTopY(stageRound, slotIndex, kLooseCardGap);
 
+  /// Top Y using [kCompactCardGap].
   double compactTopY(int stageRound, int slotIndex) =>
       _stackTopY(stageRound, slotIndex, kCompactCardGap);
 
+  /// Resting Y for a slot when [viewFocus] is the active tab.
   double restingStageY(int stageRound, int viewFocus, int slotIndex) {
     if (stageRound == viewFocus) {
       return stageRound == 0
@@ -39,6 +52,7 @@ class BracketLayoutEngine {
     return compactTopY(stageRound, slotIndex);
   }
 
+  /// Column layout Y for one tab snapshot (main column + peek alignment).
   double layoutStageYForView(
     int stageRound,
     int viewFocus,
@@ -126,6 +140,7 @@ class BracketLayoutEngine {
     return compactTopY(stageRound, slotIndex);
   }
 
+  /// Animated top Y for a slot; used by [BracketStage] and connectors.
   double matchTopY(
     int animFrom,
     int animTo,
@@ -173,6 +188,7 @@ class BracketLayoutEngine {
     return compactTopY(roundIndex, slotIndex);
   }
 
+  /// Scrollable height needed for one visible round column.
   double contentHeightForColumn(
     int columnRound,
     int animFrom,
@@ -200,16 +216,20 @@ class BracketLayoutEngine {
     return maxBottom + 24;
   }
 
+  /// Left edge X of a round column.
   double columnLeft(int roundIndex) => roundIndex * columnPitch;
 
+  /// Connector start on the right edge of a slot.
   Offset cardAnchorRight(int roundIndex, int slotIndex, double topY) {
     return Offset(columnLeft(roundIndex) + cardWidth, topY + slotHeight / 2);
   }
 
+  /// Connector end on the left edge of a slot.
   Offset cardAnchorLeft(int roundIndex, int slotIndex, double topY) {
     return Offset(columnLeft(roundIndex), topY + slotHeight / 2);
   }
 
+  /// Horizontal gutter X between feeder round and its children.
   double gutterXForFeederRound(int feederRound) =>
       columnLeft(feederRound) + cardWidth + (columnPitch - cardWidth) / 2;
 }
